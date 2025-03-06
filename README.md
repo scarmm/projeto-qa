@@ -1,4 +1,4 @@
-# Projeto QA 🎉
+# Projeto QA
 
 ## 📢 Informações:
 
@@ -13,12 +13,13 @@
 
 - PHP
 - SQL
+- JavaScript
 - HTML5
 - CSS3
-- XAMPP
+- XAMPP (8.2.12 / PHP 8.2.12)
 - PhpMyAdmin
 
-## 💻 Equipe de Desenvolvedores:
+## 💻 Equipe (N° 6):
 
 <table>
   <tr>

@@ -1,0 +1,172 @@
+* {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+    font-family: Arial, sans-serif;
+    text-decoration: none;
+}
+
+body {
+    background-color: #f4f4f4;
+}
+
+.container{
+    width: 100%;
+    height: 100vh;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    padding: 20px;
+}
+
+.information{
+    width: 100%;
+    padding: 10px;
+}
+
+.information.error{
+    background-color: #f8d7da;
+    color: #721c24;
+    border: 1px solid #f5c6cb;
+    border-radius: 5px;
+}
+
+.information.success{
+    background-color: #d4edda;
+    color: #155724;
+    border: 1px solid #c3e6cb;
+    border-radius: 5px;
+}
+
+a.link{
+    color: #007bff;
+    cursor: pointer;
+    font-weight: bold;
+    transition: all 300ms ease-in-out;
+}
+
+a.link:hover{
+    color: #0056b3;
+}
+
+/* error */
+
+.error-section{
+    width: 100%;
+    text-align: center;
+    pointer-events: none;
+    user-select: none;
+}
+
+.error-title{
+    font-size: 20rem;
+    letter-spacing: 50px;
+    text-align: center;
+    color: gray;
+}
+
+.error-description{
+    font-size: 1.5rem;
+    text-align: center;
+    color: gray;
+}
+
+/* profile */
+
+.profile-section{
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+    width: 450px;
+    gap: 20px;
+    text-align: center;
+}
+
+.profile-section form button{
+    padding: 10px;
+    border: none;
+    border-radius: 5px;
+    background-color: red;
+    box-shadow: 0 0 5px rgba(255, 0, 0, .5);
+    color: #fff;
+    cursor: pointer;
+    transition: all 300ms ease-in-out;
+}
+
+.profile-section form button:hover{
+    transform: scale(1.1);
+}
+
+/* register/login */
+
+.panel-section{
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+    width: 450px;
+    gap: 20px;
+}
+
+.panel-section form{
+    width: 100%;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+    background-color: #fff;
+    box-shadow: 0 0 5px rgba(0,0,0,0.1);
+    gap: 20px;
+    padding: 20px;
+}
+
+.form-group{
+    width: 100%;
+    text-align: center;
+}
+
+.panel-section form input{
+    width: 100%;
+    padding: 10px;
+    outline: none;
+    border: 1px solid #ccc;
+    box-shadow: 0 0 5px rgba(0,0,0,0.1);
+    border-radius: 5px;
+}
+
+.panel-section form button{
+    width: 300px;
+    padding: 10px;
+    border: none;
+    border-radius: 5px;
+    background-color: green;
+    box-shadow: 0 0 5px rgba(0, 255, 0, .5);
+    color: #fff;
+    margin: 0 auto;
+    cursor: pointer;
+    transition: all 300ms ease-in-out;
+}
+
+.panel-section form button:hover{
+    transform: scale(1.1);
+}
+
+
+/* responsividade */
+
+@media screen and (max-width: 960px) {
+
+    
+    /* 404 */
+
+    .error-title{
+        font-size: 10rem;
+        letter-spacing: 0px;
+    }
+
+    .error-description{
+        font-size: 1.2rem;
+    }
+}
+
