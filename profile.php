@@ -1,5 +1,5 @@
 <?php
-    require "src/database/config.php";
+    require "src/database/connection.php";
 
     $pdo = Database::getConnection();
 
@@ -27,33 +27,6 @@
         <title>Perfil</title>
 
         <link rel="stylesheet" href="src/styles/index.css">
-        
-        <style>
-            #profile_image {
-                display: none;
-            }
-
-            #previewImage {
-                cursor: pointer;
-                width: 250px;
-                height: 250px;
-                object-fit: cover;
-                border-radius: 50%;
-                padding: 10px;
-                box-shadow: 0px 0px 5px rgba(0, 0, 0, .1);
-                transition: all 300ms ease-in-out;
-            }
-
-            #previewImage:hover {
-                box-shadow: 0px 0px 10px rgba(0, 0, 0, .2);
-            }
-
-            #saveButton {
-                display: none;
-                margin-top: 10px;
-            }
-        </style>
-
     </head>
     <body>
         <main class="container">
@@ -63,16 +36,21 @@
                 <?php if (isset($_GET["typeMsg"]) && isset($_GET["message"])){ ?>
                     <?php if ($_GET["typeMsg"] == "success"){ ?>
                         <div class="success information">
-                            <span><?php echo $_GET["message"] ?></span>
+                            <span><?php echo htmlspecialchars($_GET["message"], ENT_QUOTES, 'UTF-8'); ?></span>
                         </div>
                     <?php }else if ($_GET["typeMsg"] == "error"){ ?>
                         <div class="error information">
-                            <span><?php echo $_GET["message"] ?></span>
+                            <span><?php echo htmlspecialchars($_GET["message"], ENT_QUOTES, 'UTF-8'); ?></span>
                         </div>
                     <?php }; ?>
                 <?php }; ?>
 
-                <form action="src/php/global.php?type=upload" method="POST" enctype="multipart/form-data">
+                <form action="src/php/global.php" method="POST" enctype="multipart/form-data">
+
+                    <!-- protection -->
+                    <input type="hidden" name="type" value="upload">
+                    <input type="hidden" name="csrf_token" value="LSZzKRtj2Ke">
+                    
                     <div>
                         <img src="<?php echo $userImage; ?>" alt="Foto do usuário" id="previewImage">
                     </div>
@@ -83,10 +61,15 @@
                 </form>
 
                 <div>
-                    <h2>Bem-vindo, <?php echo $_SESSION["usuario"] ?? "Usuário!" ?></h2>
+                    <h2>Bem-vindo, <?php echo htmlspecialchars($_SESSION["usuario"] ?? "Usuário!", ENT_QUOTES, 'UTF-8'); ?></h2>
                 </div>
 
-                <form action="src/php/global.php?type=logout" method="POST">
+                <form action="src/php/global.php" method="POST">
+
+                    <!-- protection -->
+                    <input type="hidden" name="type" value="logout">
+                    <input type="hidden" name="csrf_token" value="LSZzKRtj2Ke">
+
                     <button type="submit" class="logout-btn">Logout</button>
                 </form>
             </section>

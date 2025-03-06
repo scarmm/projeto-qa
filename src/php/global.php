@@ -1,32 +1,49 @@
 <?php
-    require "../database/config.php";
+    require "../database/connection.php";
 
     $pdo = Database::getConnection();
 
+    session_set_cookie_params([
+        'httponly' => true,
+        'samesite' => 'Strict',
+        'secure' => isset($_SERVER['HTTPS'])
+    ]);
     session_start();
     
-    $_SESSION['logged'] = $_SESSION['logged'] ?? NULL;
+    $_SESSION['logged'] = $_SESSION['logged'] ?? NULL; // Se não existir, atribui NULL
 
-    if (isset($_GET["type"])) {
+    if (isset($_POST["type"])) {
 
-        if ($_SERVER["REQUEST_METHOD"] === "POST" && $_GET["type"] === "logout" && $_SESSION["logged"]) {
+        if (!isset($_POST["csrf_token"]) || $_POST["csrf_token"] !== "LSZzKRtj2Ke") {
+            header("Location: ../../error.php?errorCode=403");
+            exit();
+        };
 
+        if ($_POST["type"] === "logout") {
+
+            if (!isset($_SESSION["logged"]) || $_SESSION["logged"] !== true) {
+                header("Location: ../../index.php");
+                exit();
+            };
+
+            $_SESSION = [];
+            
             session_destroy();
 
-            unset($_SESSION["user_id"]);
-            unset($_SESSION["logged"]);
-            unset($_SESSION["usuario"]);
+            setcookie(session_name(), '', time() - 42000, '/'); // Exclui o cookie da sessão
 
             header("Location: ../../index.php");
 
-        }else if ($_SERVER["REQUEST_METHOD"] === "POST" && $_GET["type"] === "login") {
+            exit();
 
-            $user = trim($_POST["usuario"]);
+        }else if ($_POST["type"] === "login" && $_SERVER["REQUEST_METHOD"] === "POST") {
+
+            $user = htmlspecialchars(trim($_POST["usuario"]), ENT_QUOTES, 'UTF-8');
             $pass = trim($_POST["senha"]);
         
             if (empty($user) || empty($pass)) {
                 header("Location: ../../login.php?typeMsg=error&message=Todos os campos são obrigatórios.");
-                die();
+                exit();
             };
         
             try {
@@ -37,6 +54,8 @@
                 $userData = $query->fetch(PDO::FETCH_ASSOC);
         
                 if ($userData && password_verify($pass, $userData["senha"])) {
+                    session_regenerate_id(true);
+
                     $_SESSION["user_id"] = $userData["id"];
                     $_SESSION["usuario"] = $userData["usuario"];
                     $_SESSION["logged"] = true;
@@ -45,33 +64,45 @@
                     exit;
                 } else {
                     header("Location: ../../login.php?typeMsg=error&message=Usuário ou senha incorretos.");
-                    die();
+                    exit();
                 };
         
             } catch (PDOException $e) {
-                header("Location: ../../login.php?typeMsg=error&message=Erro ao conectar: " . $e->getMessage());
-                die();
+                header("Location: ../../login.php?typeMsg=error&message=Ocorreu um erro, tente novamente.");
+                error_log($e->getMessage(), 3, "/var/log/meu_sistema.log");
+                exit();
             };
 
-        }else if ($_SERVER["REQUEST_METHOD"] === "POST" && $_GET["type"] === "register"){
+        }else if ($_POST["type"] === "register" && $_SERVER["REQUEST_METHOD"] === "POST"){
 
-            $user = trim($_POST["usuario"]);
+            $user = htmlspecialchars(trim($_POST["usuario"]), ENT_QUOTES, 'UTF-8');
+
             $pass = trim($_POST["senha"]);
             $confirmPass = trim($_POST["senhaC"]);
 
             if (empty($user) || empty($pass) || empty($confirmPass)) {
                 header("Location: ../../register.php?typeMsg=error&message=Todos os campos são obrigatórios.");
-                die();
+                exit();
+            };
+
+            if (strlen($user) < 3) {
+                header("Location: ../../register.php?typeMsg=error&message=O usuário deve ter no mínimo 3 caracteres.");
+                exit();
+            };
+
+            if (preg_match("/[^a-zA-Z0-9]/", $user)) {
+                header("Location: ../../register.php?typeMsg=error&message=O usuário deve conter apenas letras e números.");
+                exit();
             };
 
             if ($pass !== $confirmPass) {
                 header("Location: ../../register.php?typeMsg=error&message=As senhas não coincidem.");
-                die();
+                exit();
             };
 
             if (strlen($pass) < 6) {
                 header("Location: ../../register.php?typeMsg=error&message=A senha deve ter no mínimo 6 caracteres.");
-                die();
+                exit();
             };
 
             try {
@@ -81,7 +112,7 @@
 
                 if ($query->fetch()) {
                     header("Location: ../../register.php?typeMsg=error&message=Usuário já registrado.");
-                    die();
+                    exit();
                 };
 
                 $hashedPassword = password_hash($pass, PASSWORD_DEFAULT);
@@ -94,15 +125,16 @@
                     header("Location: ../../login.php?typeMsg=success&message=Registrado com sucesso.");
                 } else {
                     header("Location: ../../register.php?typeMsg=error&message=Erro ao registrar.");
-                    die();
+                    exit();
                 };
 
             } catch (PDOException $e) {
-                header("Location: ../../register.php?typeMsg=error&message=Erro ao conectar: " . $e->getMessage());
-                die();
+                header("Location: ../../login.php?typeMsg=error&message=Ocorreu um erro, tente novamente.");
+                error_log($e->getMessage(), 3, "/var/log/meu_sistema.log");
+                exit();
             };
 
-        } else if ($_SERVER["REQUEST_METHOD"] === "POST" && $_GET["type"] === "upload"){
+        } else if ($_POST["type"] === "upload" && $_SERVER["REQUEST_METHOD"] === "POST"){
             if (isset($_FILES["profile_image"]) && $_FILES["profile_image"]["error"] === UPLOAD_ERR_OK) {
                 $fileTmpPath = $_FILES["profile_image"]["tmp_name"];
                 $fileName = $_FILES["profile_image"]["name"];
@@ -114,12 +146,12 @@
                 if (!in_array($fileType, $allowedTypes)) {
                     header("Location: ../../profile.php?typeMsg=error&message=Formato inválido. Use JPEG, PNG ou WEBP.");
                     exit();
-                }
+                };
             
                 if ($fileSize > 2 * 1024 * 1024) {
                     header("Location: ../../profile.php?typeMsg=error&message=Imagem muito grande. Máximo 2MB.");
                     exit();
-                }
+                };
             
                 $imageData = file_get_contents($fileTmpPath);
             
@@ -137,14 +169,14 @@
             } else {
                 header("Location: ../../profile.php?typeMsg=error&message=Nenhuma imagem foi enviada.");
                 exit();
-            }
+            };
 
         }else {
-           header("Location: ../../404.php");
+           header("Location: ../../error.php?errorCode=404");
         };
 
     }else{
-        header("Location: ../../404.php");
+        header("Location: ../../error.php?errorCode=404");
     };
 
 ?>

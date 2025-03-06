@@ -4,7 +4,7 @@
         <meta charset="UTF-8">
         <meta http-equiv="X-UA-Compatible" content="IE=edge">
         <meta name="viewport" content="width=device-width, initial-scale=1.0">
-        <title>404</title>
+        <title>Error - <?php echo $_GET["errorCode"] ?? "404"; ?></title>
 
         <link rel="stylesheet" href="src/styles/index.css">
     </head>
@@ -13,10 +13,10 @@
 
             <section class="error-section">
                 <div>
-                    <h1 class="error-title">404</h1>
+                    <h1 class="error-title"><?php echo $_GET["errorCode"] ?? "404"; ?></h1>
                 </div>
                 <div>
-                    <p class="error-description">Página não encontrada</p>
+                    <p class="error-description">Erro inesperado!</p>
                 </div>
             </section>
 

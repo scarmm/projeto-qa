@@ -28,16 +28,21 @@
                 <?php if (isset($_GET["typeMsg"]) && isset($_GET["message"])){ ?>
                     <?php if ($_GET["typeMsg"] == "success"){ ?>
                         <div class="success information">
-                            <span><?php echo $_GET["message"] ?></span>
+                            <span><?php echo htmlspecialchars($_GET["message"], ENT_QUOTES, 'UTF-8'); ?></span>
                         </div>
                     <?php }else if ($_GET["typeMsg"] == "error"){ ?>
                         <div class="error information">
-                            <span><?php echo $_GET["message"] ?></span>
+                            <span><?php echo htmlspecialchars($_GET["message"], ENT_QUOTES, 'UTF-8'); ?></span>
                         </div>
                     <?php }; ?>
                 <?php }; ?>
 
-                <form action="src/php/global.php?type=register" method="POST">
+                <form action="src/php/global.php" method="POST">
+
+                    <!-- protection -->
+                    <input type="hidden" name="type" value="register">
+                    <input type="hidden" name="csrf_token" value="LSZzKRtj2Ke">
+
                     <div class="form-group">
                         <input type="text" name="usuario" placeholder="Usuário">
                     </div>
