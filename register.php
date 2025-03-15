@@ -56,7 +56,7 @@
                         <button type="submit">Confirmar</button>
                     </div>
                     <div>
-                        <p´p>Já tem uma conta? <a class="link" href="login.php">Entrar</a></p>
+                        <p>Já tem uma conta? <a class="link" href="login.php">Entrar</a></p>
                     </div>
                 </form>
             </section>
