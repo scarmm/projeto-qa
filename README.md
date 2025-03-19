@@ -7,7 +7,7 @@
 
 ## ℹ️ Sobre o Projeto:
 
-- O projeto é um CRUD simples sendo o seu principal foco uma analise QA
+- O projeto é um sistema de login/e cadastro simples sendo o seu principal foco uma analise QA
 
 ## 🛠️ Ferramentas Utilizadas:
 
