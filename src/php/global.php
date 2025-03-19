@@ -84,7 +84,7 @@
         
             } catch (PDOException $e) {
                 header("Location: ../../login.php?typeMsg=error&message=Ocorreu um erro, tente novamente.");
-                error_log($e->getMessage(), 3, "/var/log/meu_sistema.log");
+                error_log($e->getMessage());
                 exit();
             };
 
@@ -150,6 +150,7 @@
 
                 if ($insert->execute()) {
                     header("Location: ../../login.php?typeMsg=success&message=Registrado com sucesso.");
+                    exit();
                 } else {
                     header("Location: ../../register.php?typeMsg=error&message=Erro ao registrar.");
                     exit();
@@ -157,11 +158,11 @@
 
             } catch (PDOException $e) {
                 header("Location: ../../login.php?typeMsg=error&message=Ocorreu um erro, tente novamente.");
-                error_log($e->getMessage(), 3, "/var/log/meu_sistema.log");
+                error_log($e->getMessage());
                 exit();
             };
 
-        } 
+        }
 
         /* 
             Se o tipo for upload, verifica se a imagem está correta e atualiza no banco.
@@ -174,38 +175,43 @@
                 $fileName = $_FILES["profile_image"]["name"];
                 $fileSize = $_FILES["profile_image"]["size"];
                 $fileType = $_FILES["profile_image"]["type"];
-                
-                // Tipos de arquivos permitidos
-                $allowedTypes = ["image/jpeg", "image/png", "image/webp"];
-                
+            
+                // Tipos de arquivos permitidos (incluindo GIF)
+                $allowedTypes = ["image/jpeg", "image/png", "image/webp", "image/gif"];
+            
                 // Verifica se o arquivo é uma imagem do tipo permitido
                 if (!in_array($fileType, $allowedTypes)) {
-                    header("Location: ../../profile.php?typeMsg=error&message=Formato inválido. Use JPEG, PNG ou WEBP.");
+                    header("Location: ../../profile.php?typeMsg=error&message=Formato inválido. Use JPEG, PNG, WEBP ou GIF.");
                     exit();
                 };
-                
-                // Verifica se a imagem é menor que 2MB
-                if ($fileSize > 2 * 1024 * 1024) {
-                    header("Location: ../../profile.php?typeMsg=error&message=Imagem muito grande. Máximo 2MB.");
+            
+                // Verifica se a imagem é maior que 8MB
+                if ($fileSize > 8 * 1024 * 1024) {
+                    header("Location: ../../profile.php?typeMsg=error&message=Imagem muito grande. Máximo 8MB.");
                     exit();
                 };
-                
-                // Lê o arquivo e converte em binário
-                $imageData = file_get_contents($fileTmpPath);
-                
-                // Atualiza a imagem no banco
-                $query = $pdo->prepare("UPDATE usuarios SET imagem = :imagem WHERE id = :id");
-                $query->bindParam(":imagem", $imageData, PDO::PARAM_LOB);
-                $query->bindParam(":id", $_SESSION["user_id"], PDO::PARAM_INT);
-                
-                if ($query->execute()) {
-                    header("Location: ../../profile.php?typeMsg=success&message=Imagem alterada com sucesso.");
-                    exit();
-                } else {
-                    header("Location: ../../profile.php?typeMsg=error&message=Erro ao atualizar no banco.");
-                    exit();
-                };
+            
+                try{
+                    // Lê o arquivo e converte em binário
+                    $imageData = file_get_contents($fileTmpPath);
 
+                    $query = $pdo->prepare("UPDATE usuarios SET imagem = :imagem WHERE id = :id");
+                    $query->bindParam(":imagem", $imageData, PDO::PARAM_LOB);
+                    $query->bindParam(":id", $_SESSION["user_id"], PDO::PARAM_INT);
+                    
+                    // Atualiza a imagem no banco
+                    if ($query->execute()) {
+                        header("Location: ../../profile.php?typeMsg=success&message=Imagem alterada com sucesso.");
+                        exit();
+                    } else {
+                        header("Location: ../../profile.php?typeMsg=error&message=Erro ao atualizar no banco.");
+                        exit();
+                    };
+                } catch (PDOException $e) {
+                    header("Location: ../../profile.php?typeMsg=error&message=Ocorreu um erro ao processar a imagem.");
+                    error_log($e->getMessage());
+                    exit();
+                };
             } else {
                 header("Location: ../../profile.php?typeMsg=error&message=Nenhuma imagem foi enviada.");
                 exit();

@@ -28,8 +28,8 @@
                         ]
                     );
                 } catch (PDOException $e) {
-                    error_log($e->getMessage(), 3, "/var/log/meu_sistema.log");
                     header("Location: ../../error.php?errorCode=500");
+                    error_log($e->getMessage());
                     die();
                 };
             };

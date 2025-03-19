@@ -16,7 +16,15 @@
     $query->execute();
     $userData = $query->fetch(PDO::FETCH_ASSOC);
 
-    $userImage = !empty($userData["imagem"]) ? "data:image/jpeg;base64,".base64_encode($userData["imagem"]) : "public/user.png";
+    // Verifica se há uma imagem no banco
+    if (!empty($userData["imagem"])) {
+        $finfo = new finfo(FILEINFO_MIME_TYPE); // Cria um objeto para detectar o tipo MIME
+        $mimeType = $finfo->buffer($userData["imagem"]); // Obtém o tipo da imagem
+
+        $userImage = "data:$mimeType;base64," . base64_encode($userData["imagem"]);
+    } else {
+        $userImage = "public/user.png";
+    };
 ?>
 
 <!DOCTYPE html>
@@ -57,7 +65,7 @@
                     </div>
                     <input type="file" name="profile_image" id="profile_image" accept="image/*">
                     <div id="saveButton">
-                        <button style="background-color: rgb(53, 153, 204); width: 100%; box-shadow: 0px 0px 5px rgb(53, 153, 204);" type="submit" name="upload">Salvar</button>
+                        <button style="background-color: #3599cc; width: 100%; box-shadow: 0px 0px 5px #3599cc;" type="submit" name="upload">Salvar</button>
                     </div>
                 </form>
 
